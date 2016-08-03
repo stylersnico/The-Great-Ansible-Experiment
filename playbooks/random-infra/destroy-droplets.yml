@@ -101,10 +101,10 @@
   vars:
     do_token: DO_API_KEY
     droplets:
-    - librenms
+    - munin
 
   tasks:
-  - name: ensure LibreNMS droplet is deleted
+  - name: ensure Munin droplet is deleted
     digital_ocean: >
       state=absent
       command=droplet
