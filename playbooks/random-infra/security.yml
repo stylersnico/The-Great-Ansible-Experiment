@@ -1,0 +1,81 @@
+---
+#First of all - NTP
+- hosts: all
+  roles:
+    - role: resmo.ntp
+      ntp_config_server: [0.de.pool.ntp.org, 1.de.pool.ntp.org, 2.de.pool.ntp.org, 3.de.pool.ntp.org]
+
+#SSH + auto-updates
+- hosts: all
+  vars:
+    security_ssh_port: 22
+    security_ssh_password_authentication: "no"
+    security_ssh_permit_root_login: "without-password"
+    security_ssh_usedns: "no"
+    security_autoupdate_enabled: true
+    security_fail2ban_enabled: true
+  roles:
+    - geerlingguy.security
+
+
+#Needrestart
+- hosts: all
+  tasks:
+    - name: Install NeedRestart
+      apt: name=needrestart state=present
+
+#Firewall
+- hosts: loadbalancer
+  roles:
+    - franklinkim.ufw
+  vars:
+    ufw_rules:
+      - { port: 22, rule: allow, from_ip: '46.101.227.239' }
+      - { port: 80, rule: allow }
+      - { port: 4949, rule: allow, from_ip: '139.59.214.129' }
+    ufw_logging: full
+
+- hosts: nginx
+  roles:
+    - franklinkim.ufw
+  vars:
+    ufw_rules:
+      - { port: 22, rule: allow, from_ip: '46.101.227.239' }
+      - { port: 80, rule: allow, from_ip: '46.101.201.239' }
+      - { port: 4949, rule: allow, from_ip: '139.59.214.129' }
+      - { rule: allow, from_ip: '46.101.99.247' }
+      - { rule: allow, from_ip: '139.59.140.250' }
+    ufw_logging: full
+
+- hosts: galera
+  roles:
+    - franklinkim.ufw
+  vars:
+    ufw_rules:
+      - { port: 22, rule: allow, from_ip: '46.101.227.239' }
+      - { port: 3306, rule: allow, from_ip: '46.101.99.247' }
+      - { port: 3306, rule: allow, from_ip: '139.59.140.250' }
+      - { port: 4949, rule: allow, from_ip: '139.59.214.129' }
+      - { rule: allow, from_ip: '46.101.101.229' }
+      - { rule: allow, from_ip: '46.101.190.144' }
+      - { rule: allow, from_ip: '46.101.115.102' }
+    ufw_logging: full
+
+- hosts: munin
+  roles:
+    - franklinkim.ufw
+  vars:
+    ufw_rules:
+      - { port: 22, rule: allow, from_ip: '46.101.227.239' }
+      - { port: 80, rule: allow }
+      - { port: 4949, rule: allow, from_ip: '139.59.214.129' }
+    ufw_logging: full
+
+- hosts: digitalocean
+  roles:
+    - franklinkim.ufw
+  vars:
+    ufw_rules:
+      - { port: 22, rule: allow }
+      - { port: 4949, rule: allow, from_ip: '139.59.214.129' }
+    ufw_logging: full

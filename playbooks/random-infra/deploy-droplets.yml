@@ -1,0 +1,127 @@
+---
+#Here we deploy droplets for NGINX stack
+- hosts: digitalocean
+
+  vars:
+    do_token: DO_API_KEY
+    droplets:
+    - nginx-01
+    - nginx-02
+
+  tasks:
+  - name: ensure ssh key exists
+    user: >
+      name={{ ansible_user_id }}
+      generate_ssh_key=yes
+      ssh_key_file=.ssh/id_ed25519
+
+  - name: ensure key exists at DigitalOcean
+    digital_ocean: >
+      state=present
+      command=ssh
+      name=ansible_ssh_key
+      ssh_pub_key={{ lookup('file', '~/.ssh/id_ed25519.pub') }}
+      api_token={{ do_token }}
+    register: my_ssh_key
+
+  - name: ensure web stack exist
+    digital_ocean: >
+      state=present
+      command=droplet
+      name={{ item }}
+      unique_name=yes
+      size_id=512mb
+      region_id=fra1
+      image_id=debian-8-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: "{{ droplets }}"
+    register: droplet_details
+
+  - name: Show details
+    debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: "{{ droplet_details.results }}"
+
+
+#Here we deploy droplet for HA Proxy
+- hosts: digitalocean
+
+  vars:
+    do_token: DO_API_KEY
+    droplets:
+    - loadbalancer-01
+
+  tasks:
+  - name: ensure web stack exist
+    digital_ocean: >
+      state=present
+      command=droplet
+      name={{ item }}
+      unique_name=yes
+      size_id=512mb
+      region_id=fra1
+      image_id=ubuntu-16-04-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: "{{ droplets }}"
+    register: droplet_details
+
+  - name: Show details
+    debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: "{{ droplet_details.results }}"
+
+#Here we deploy droplets for the gallera MariaDB Cluster
+- hosts: digitalocean
+
+  vars:
+    do_token: DO_API_KEY
+    droplets:
+    - galera-01
+    - galera-02
+    - galera-03
+
+  tasks:
+  - name: ensure galera stack exists
+    digital_ocean: >
+      state=present
+      command=droplet
+      name={{ item }}
+      unique_name=yes
+      size_id=1gb
+      region_id=fra1
+      image_id=debian-8-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: "{{ droplets }}"
+    register: droplet_details
+
+  - name: Show details
+    debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: "{{ droplet_details.results }}"
+
+#Here we deploy droplet for Munin
+- hosts: digitalocean
+
+  vars:
+    do_token: DO_API_KEY
+    droplets:
+    - munin
+
+  tasks:
+  - name: ensure Munin droplet exist
+    digital_ocean: >
+      state=present
+      command=droplet
+      name={{ item }}
+      unique_name=yes
+      size_id=2gb
+      region_id=fra1
+      image_id=debian-8-x64
+      ssh_key_ids={{ my_ssh_key.ssh_key.id }}
+      api_token={{ do_token }}
+    with_items: "{{ droplets }}"
+    register: droplet_details
+
+  - name: Show details
+    debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: "{{ droplet_details.results }}"

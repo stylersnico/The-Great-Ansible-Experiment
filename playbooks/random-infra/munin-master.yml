@@ -1,0 +1,56 @@
+---
+- hosts: munin
+  roles:
+    - geerlingguy.munin
+  vars:
+    munin_htmldir: /var/cache/munin/www
+    munin_hosts:
+      - {
+        name: "ansible",
+        address: "46.101.227.239",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "haproxy",
+        address: "46.101.201.239",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "nginx-01",
+        address: "46.101.99.247",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "nginx-02",
+        address: "139.59.140.250",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "galera-01",
+        address: "46.101.101.229",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "galera-02",
+        address: "46.101.190.144",
+        extra: ["use_node_name yes"]
+      }
+      - {
+        name: "galera-03",
+        address: "46.101.115.102",
+        extra: ["use_node_name yes"]
+      }
+
+- hosts: munin
+  roles:
+    - role: bennojoy.nginx
+      nginx_http_params:
+        sendfile: "on"
+        access_log: "/var/log/nginx/access.log"
+      nginx_sites:
+       - server:
+          file_name: www.vhost
+          listen: 80
+          server_name: _
+          root: "/var/cache/munin/www"
+          location1: {name: /, try_files: "$uri $uri/ /index.html"}

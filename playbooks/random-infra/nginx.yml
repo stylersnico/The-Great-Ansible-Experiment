@@ -1,0 +1,15 @@
+---
+- hosts: nginx
+  roles:
+    - role: bennojoy.nginx
+      nginx_http_params:
+        sendfile: "on"
+        access_log: "/var/log/nginx/access.log"
+      nginx_sites:
+       - server:
+          file_name: www.vhost
+          listen: 80
+          server_name: _
+          root: "/var/www/html/"
+          location1: {name: /, try_files: "$uri $uri/ /index.html"}
+          location2: {name: /images/, try_files: "$uri $uri/ /index.html"}

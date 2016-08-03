@@ -1,0 +1,19 @@
+- hosts: loadbalancer
+  tasks:
+  - name: install make
+    apt: name=make state=present
+
+- hosts: loadbalancer
+  vars:
+    haproxy_frontends:
+      http_front:
+      - bind *:80
+      - default_backend http_back
+    haproxy_backends:
+      http_back:
+      - balance roundrobin
+      - server http1 139.59.140.250:80 check
+      - server http2 46.101.99.247:80 check
+
+  roles:
+  - role: SimpliField.haproxy

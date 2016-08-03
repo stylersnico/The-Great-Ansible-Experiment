@@ -1,1 +1,19 @@
-#
+- hosts: all
+  tasks:
+   - name: updates a server
+     apt: update_cache=yes cache_valid_time=3600
+
+   - name: upgrade a server
+     apt: upgrade=dist dpkg_options='force-confold,force-confdef'
+
+   - name: Check if a reboot is required
+     register: reboot
+     stat: path=/var/run/reboot-required get_md5=no
+
+   - name: Reboot the services
+     shell: needrestart -ra -l
+     when: reboot.stat.exists == false
+
+   - name: Reboot the server
+     command: /sbin/reboot
+     when: reboot.stat.exists == true

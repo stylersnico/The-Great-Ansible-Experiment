@@ -1,0 +1,12 @@
+- hosts: unisonmaster
+  roles:
+    - weareinteractive.unison
+  vars:
+    unison_configs:
+      - name: sync
+        src: /var/www
+        dest: ssh://139.59.140.250//var/www
+        unison_user: unison
+        ignore:
+          - ".*"
+          - "~*"

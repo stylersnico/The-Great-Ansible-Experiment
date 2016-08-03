@@ -1,0 +1,10 @@
+- hosts: all
+  roles:
+    - { role: geerlingguy.munin-node }
+  vars:
+    munin_node_bind_host: "*"
+
+- hosts: all
+  tasks:
+   - name: Enable Munin Modules
+     shell: "munin-node-configure --shell --families=contrib,auto | sh -x && service munin-node restart"
