@@ -1,0 +1,20 @@
+[digitalocean]
+localhost ansible_connection=local
+
+[loadbalancer]
+46.101.201.239 ansible_connection=ssh ansible_user=root
+
+[nginx]
+46.101.99.247 ansible_connection=ssh ansible_user=root
+139.59.140.250 ansible_connection=ssh ansible_user=root
+
+[unisonmaster]
+46.101.99.247 ansible_connection=ssh ansible_user=root
+
+[galera]
+46.101.101.229 ansible_connection=ssh ansible_user=root
+46.101.190.144 ansible_connection=ssh ansible_user=root
+46.101.115.102 ansible_connection=ssh ansible_user=root
+
+[munin]
+139.59.214.129 ansible_connection=ssh ansible_user=root
