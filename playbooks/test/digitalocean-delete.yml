@@ -20,9 +20,9 @@
       api_token={{ do_token }}
     register: my_ssh_key
 
-  - name: ensure test droplet exists
+  - name: ensure test droplet is deleted 
     digital_ocean: >
-      state=present
+      state=absent
       command=droplet
       name=droplet-test
       unique_name=yes
@@ -32,6 +32,3 @@
       ssh_key_ids={{ my_ssh_key.ssh_key.id }}
       api_token={{ do_token }}
     register: droplet_test
-
-  - name: Show Ip Adress
-    debug: msg="IP is {{ droplet_test.droplet.ip_address }}"

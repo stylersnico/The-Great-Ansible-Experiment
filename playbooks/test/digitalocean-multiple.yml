@@ -3,6 +3,9 @@
 
   vars:
     do_token: DO_API_KEY
+    droplets:
+    - droplet-one
+    - droplet-two
 
   tasks:
   - name: ensure ssh key exists
@@ -20,18 +23,20 @@
       api_token={{ do_token }}
     register: my_ssh_key
 
-  - name: ensure test droplet exists
+  - name: ensure test droplets exists
     digital_ocean: >
       state=present
       command=droplet
-      name=droplet-test
+      name={{ item }}
       unique_name=yes
       size_id=512mb
       region_id=fra1
       image_id=debian-8-x64
       ssh_key_ids={{ my_ssh_key.ssh_key.id }}
       api_token={{ do_token }}
-    register: droplet_test
+    with_items: "{{ droplets }}"
+    register: droplet_details
 
-  - name: Show Ip Adress
-    debug: msg="IP is {{ droplet_test.droplet.ip_address }}"
+  - name: Show details
+    debug: msg="IP is {{ item.droplet.ip_address }}"
+    with_items: "{{ droplet_details.results }}"
