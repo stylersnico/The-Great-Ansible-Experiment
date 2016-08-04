@@ -4,7 +4,7 @@ The Great Ansible Experiment
 ##License
 The Great Ansible Experiment
 
-**The license doesn't apply to external roles and blog post, see comments in each files to see relative license.**
+**The license doesn't apply to external roles and blog posts.**
 
 Copyleft (C) Nicolas Simond - 2016
 
